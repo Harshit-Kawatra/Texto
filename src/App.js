@@ -1,5 +1,7 @@
-import { useState } from "react";
-import Texto from "./assets/image/Texto.png";
+import { useState, useEffect } from "react";
+import Navbar from "./assets/components/navbar";
+import "./App.css";
+
 function App() {
   function OBJtoXML(obj) {
     var xml = "";
@@ -35,7 +37,6 @@ function App() {
       try {
         let a = await fetch(text);
         let data = await a.json();
-        console.log(data);
         let finaldata = JSON.stringify(data, null, "\t");
         settext2(finaldata);
       } catch (e) {
@@ -45,64 +46,98 @@ function App() {
       }
     }
   };
+  const [savedtext, setsavedtext] = useState([]);
   const [text, settext] = useState("");
   const [text2, settext2] = useState("");
+  const deleteobj = (id) => {
+    // console.log(id);
+    var deleted = savedtext.filter((ele, index) => {
+      return index !== id;
+    });
+    setsavedtext(deleted);
+    console.log(deleted);
+  };
+  const savefunction = () => {
+    let textinstring = {
+      text: text2.toString(),
+      time: new Date().toLocaleTimeString(),
+    };
+    textinstring = savedtext.concat(textinstring);
+    text2 !== ""
+      ? setsavedtext(textinstring)
+      : alert("please enter something before save");
+  };
+  useEffect(() => {
+    if (localStorage.getItem("text")) {
+      setsavedtext([...JSON.parse(localStorage.getItem("text"))]);
+    }
+  }, []);
+  useEffect(() => {
+    localStorage.setItem("text", JSON.stringify(savedtext));
+  }, [savedtext]);
   return (
     <div>
-      <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container align-item-center px-4">
-          <a class="navbar-brand" href="#">
-            <img src={Texto} style={{ height: "60px", width: "100px" }} />
-          </a>
-          <button
-            class="navbar-toggler collapsed"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNavAltMarkup"
-            aria-controls="navbarNavAltMarkup"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div
-            class="navbar-collapse justify-content-end collapse"
-            id="navbarNavAltMarkup"
-          >
-            <div class="navbar-nav w-50 justify-content-end">
-              <a class="nav-link active mx-2" aria-current="page" href="#">
-                Home
-              </a>
-              <a class="nav-link mx-2" href="#Aboutus">
-                About Us
-              </a>
-              <a class="nav-link mx-2" href="#">
-                Reach Us
-              </a>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
+
       <div class="container my-4">
         <div className="row d-flex justify-content-around">
-          <div class="col-12 col-lg-6 d-flex flex-column align-item-center justify-content-center">
+          <div class="col-12 col-lg-6 d-flex flex-column text-box-area align-item-center justify-content-center">
+            <div className="buttons">
+              <button onClick={() => console.log(savedtext)}>
+                <i class="fa-solid fa-floppy-disk"></i>
+                <p>save</p>
+              </button>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(text);
+                }}
+              >
+                <i class="fa-solid fa-clipboard"></i>
+                <p>copy</p>
+              </button>
+              <button
+                onClick={async () => {
+                  let clipboardtxt = await navigator.clipboard.readText();
+                  if (clipboardtxt) {
+                    settext(clipboardtxt.toString());
+                  }
+                }}
+              >
+                <i class="fa-solid fa-paste"></i>
+                <p>Paste</p>
+              </button>
+            </div>
             <textarea
               className="my-2"
+              value={text}
               onInput={(e) => {
                 settext(e.target.value);
-                console.log(text);
               }}
               cols="80"
               rows="14"
               style={{ "background-color": "#c2c2c2" }}
             ></textarea>
             <p className="m-3">
-              words = {text === "" ? 0 : text.trim().split(" ").length}
+              words = {text === "" ? 0 : text.trim().split(" ").length}{" "}
               characters=
               {text.trim().length}
             </p>
           </div>
-          <div class="col-12 col-lg-6 d-flex flex-column align-item-center justify-content-center">
+          <div class="col-12 col-lg-6 d-flex flex-column text-box-area align-item-center justify-content-center">
+            <div className="buttons">
+              <button onClick={savefunction}>
+                <i class="fa-solid fa-floppy-disk"></i>
+                <p>save</p>
+              </button>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(text2);
+                }}
+              >
+                <i class="fa-solid fa-clipboard"></i>
+                <p>copy</p>
+              </button>
+            </div>
             <textarea
               className="my-2"
               value={text2}
@@ -111,24 +146,24 @@ function App() {
               rows="14"
               style={{ "background-color": "#c2c2c8" }}
             ></textarea>
-                        <p className="m-3">
-              words = {text2 === "" ? 0 : text2.trim().split(" ").length}
+            <p className="m-3">
+              words = {text2 === "" ? 0 : text2.trim().split(" ").length}{" "}
               characters=
               {text2.trim().length}
             </p>
           </div>
         </div>
 
-        <div className="d-flex justify-content-around my-4 ">
+        <div className="d-flex container flex-wrap justify-content-center my-4 ">
           <button
-            className="btn-success rounded"
+            className="btn-success rounded m-2"
             value="UpperCase"
             onClick={handelclick}
           >
             UpperCase
           </button>
           <button
-            className="btn-success rounded"
+            className="btn-success rounded m-2"
             value="Lowercase"
             onClick={handelclick}
           >
@@ -136,18 +171,45 @@ function App() {
           </button>
           <button
             value="TestApi"
-            className="btn-success rounded"
+            className="btn-success rounded m-2"
             onClick={handelclick}
           >
             TestApi
           </button>
           <button
             value="JsonToXml"
-            className="btn-success rounded"
+            className="btn-success rounded m-2"
             onClick={handelclick}
           >
             JsonToXml
           </button>
+        </div>
+        {savedtext.length ? <h2 className="m-2">Notes</h2> : ""}
+        <div class="d-flex flex-wrap">
+          {savedtext.map((item, index) => {
+            return (
+              <div class="card m-2" style={{ width: "18rem" }} key={index}>
+                <div class="card-body d-flex flex-column">
+                  <h5 class="card-title">NOTE {index}</h5>
+                  <p class="card-text">
+                    {(item.text.length >= 200)
+                      ? <>{item.text.slice(0, 200)+'....'}<button onClick={(e)=>{console.log(e);}} >readmore</button></>
+                      : item.text}
+                  </p>
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger mt-auto align-self-start"
+                      onClick={() => deleteobj(index)}
+                    >
+                      delete
+                    </button>
+                  <p className="text-secondary mb-0  align-self-end">
+                    {item.time}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
