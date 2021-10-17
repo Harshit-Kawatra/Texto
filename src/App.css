@@ -1,4 +1,16 @@
-.App {
-  display: flex;
-  flex-direction: column;
+.buttons {
+  position: absolute;
+  right: 0.8em;
+  bottom: 1em;
+}
+.buttons > button {
+  background-color: transparent;
+  border: 2px solid black;
+}
+.buttons > button > p {
+  font-size: xx-small;
+  margin: 0;
+}
+.text-box-area {
+  position: relative;
 }
