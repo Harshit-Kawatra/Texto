@@ -1,0 +1,22 @@
+{
+  "manifest_version": 2,
+  "name": "Texto",
+  "description": "Gives meaning of selected word",
+  "version": "1.69",
+  "icons": { "128": "icon.png" },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["main.js"]
+    }
+  ],
+  "background":{
+      "scripts":["bg.js"]
+  },
+
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_popup": "popup.html"
+  },
+  "permissions": ["tabs"]
+}
